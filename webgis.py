@@ -12,6 +12,7 @@ if "GEE_KEY" in os.environ:
         key_json["client_email"], 
         key_data=key_str # 🔥 QUAN TRỌNG: phải là STRING 
         ) 
+    ee.Initialize(credentials)
 else: # chạy local 
     BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
     KEY_PATH = os.path.join(BASE_DIR, "key.json") 
@@ -568,15 +569,25 @@ def get_province_from_point():
 
 @app.route('/api/countries')
 def get_countries():
-    fc = ee.FeatureCollection("FAO/GAUL/2015/level0")
-    return jsonify(fc.aggregate_array('ADM0_NAME').sort().getInfo())
-
+    try:
+        fc = ee.FeatureCollection("FAO/GAUL/2015/level0")
+        countries = fc.aggregate_array('ADM0_NAME').distinct().getInfo()
+        return jsonify(countries)
+    except Exception as e:
+        return jsonify({"error": str(e)})
 @app.route('/api/provinces')
 def get_provinces():
-    country = request.args.get('country')
-    fc = ee.FeatureCollection("FAO/GAUL/2015/level1").filter(ee.Filter.eq('ADM0_NAME', country))
-    provinces = fc.aggregate_array('ADM1_NAME').getInfo()
-    return jsonify({"provinces": list(set(provinces))})
+    try:
+        country = request.args.get('country')
+
+        fc = ee.FeatureCollection("FAO/GAUL/2015/level1") \
+            .filter(ee.Filter.eq('ADM0_NAME', country))
+
+        provinces = fc.aggregate_array('ADM1_NAME').distinct().getInfo()
+
+        return jsonify({"provinces": provinces})
+    except Exception as e:
+        return jsonify({"error": str(e)})
 
 @app.route('/api/get_province_boundary')
 def get_province_boundary():
