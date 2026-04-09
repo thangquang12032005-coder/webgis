@@ -1,18 +1,21 @@
 from flask import Flask, jsonify, request, render_template_string
 from flask_cors import CORS
-import json
 import os
+import json
 import ee
 
 if "GEE_KEY" in os.environ:
-    # chạy trên server
-    key_json = json.loads(os.environ["GEE_KEY"])
+    key_json = os.environ["GEE_KEY"]
+
+    if isinstance(key_json, str):
+        key_json = json.loads(key_json)
+
     credentials = ee.ServiceAccountCredentials(
         key_json["client_email"],
         key_data=key_json
     )
 else:
-    # chạy local
+    # chạy local thì phải có key.json
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     KEY_PATH = os.path.join(BASE_DIR, "key.json")
 
