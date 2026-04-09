@@ -12,7 +12,7 @@ if "GEE_KEY" in os.environ:
 
     credentials = ee.ServiceAccountCredentials(
         key_json["client_email"],
-        key_data=key_json
+        key_data=key_str
     )
 else:
     # chạy local thì phải có key.json
