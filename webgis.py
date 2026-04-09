@@ -1,30 +1,22 @@
 from flask import Flask, jsonify, request, render_template_string
 from flask_cors import CORS
 import os
-import json
-import ee
-
-if "GEE_KEY" in os.environ:
-    key_json = os.environ["GEE_KEY"]
-
-    if isinstance(key_json, str):
-        key_json = json.loads(key_json)
-
-    credentials = ee.ServiceAccountCredentials(
-        key_json["client_email"],
-        key_data=key_str
-    )
-else:
-    # chạy local thì phải có key.json
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    KEY_PATH = os.path.join(BASE_DIR, "key.json")
-
-    credentials = ee.ServiceAccountCredentials(
-        "earth-engine-app@duan1-470914.iam.gserviceaccount.com",
-        KEY_PATH
-    )
-
-ee.Initialize(credentials)
+import json 
+import ee 
+# ====================== GEE AUTH ====================== 
+# 
+if "GEE_KEY" in os.environ: 
+    key_str = os.environ["GEE_KEY"] # lấy string từ Render ENV 
+    key_json = json.loads(key_str) # convert sang dict 
+    credentials = ee.ServiceAccountCredentials( 
+        key_json["client_email"], 
+        key_data=key_str # 🔥 QUAN TRỌNG: phải là STRING 
+        ) 
+else: # chạy local 
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
+    KEY_PATH = os.path.join(BASE_DIR, "key.json") 
+    credentials = ee.ServiceAccountCredentials( "earth-engine-app@duan1-470914.iam.gserviceaccount.com", KEY_PATH ) 
+    ee.Initialize(credentials)
 app = Flask(__name__)
 CORS(app)
 
