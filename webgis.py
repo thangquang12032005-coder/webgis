@@ -583,9 +583,9 @@ small{
         .loading-screen { display:none; position:fixed; inset:0; background:rgba(15,23,42,0.94); z-index:9999; flex-direction:column; justify-content:center; align-items:center; color:white; backdrop-filter:blur(10px); }
         .loader { width:80px; height:80px; border:8px solid rgba(255,255,255,0.12); border-bottom-color:var(--accent); border-radius:50%; animation:rotation 1s linear infinite; }
         @keyframes rotation { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
-        #weather-toggle-btn{
+       #weather-toggle-btn{
 
-    position:absolute;
+    position:fixed;
 
     top:20px;
     left:20px;
@@ -597,7 +597,7 @@ small{
 
     border:none;
 
-    z-index:10000;
+    z-index:999999999;
 
     cursor:pointer;
 
@@ -619,19 +619,18 @@ small{
 
     transition:0.3s;
 }
-
 #weather-card{
 
     display:none;
 
-    position:absolute;
+    position:fixed;
 
     top:90px;
     left:20px;
 
     width:350px;
 
-    z-index:20000;
+    z-index:999999999;
 
     pointer-events:auto;
 
@@ -656,9 +655,7 @@ small{
         rgba(15,23,42,.45),
         rgba(15,23,42,.88)
     ),
-    url(
-'https://images.unsplash.com/photo-1506744038136-46273834b3fb'
-    );
+    url('https://images.unsplash.com/photo-1506744038136-46273834b3fb');
 
     background-size:cover;
 
@@ -666,8 +663,7 @@ small{
 
     backdrop-filter:blur(25px);
 
-    border:
-    1px solid rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.08);
 
     box-shadow:
     0 20px 60px rgba(0,0,0,.45);
