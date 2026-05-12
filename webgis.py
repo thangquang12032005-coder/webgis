@@ -1161,6 +1161,7 @@ function startProcessing() {
       renderDashboard(data);
       renderChart(data);
       updateLegend(payload.index);
+      
 
 if (data && data.future_risk_total != null) {
     const body = document.getElementById("dash-body");
@@ -1983,7 +1984,7 @@ def get_time_series(region):
         .merge(ee.ImageCollection('LANDSAT/LC09/C02/T1_L2')) \
         .filterBounds(region) \
         .filterDate('2015-01-01', '2025-12-31') \
-        .filter(ee.Filter.lt('CLOUD_COVER', 95)) \
+        .filter(ee.Filter.lt('CLOUD_COVER', 35)) \
         .sort('system:time_start') \
         .map(preprocess_image) \
         .limit(100)
@@ -2059,7 +2060,7 @@ def train_lstm(X, y):
     model.fit(
     X,
     y,
-    epochs=5,
+    epochs=2,
     batch_size=1,
     verbose=0
 )
@@ -2223,7 +2224,7 @@ def find_images():
            .merge(ee.ImageCollection('LANDSAT/LC09/C02/T1_L2')) \
            .filterBounds(region) \
            .filterDate(start.advance(-2, 'month'), start.advance(2, 'month')) \
-           .filter(ee.Filter.lt('CLOUD_COVER', 60))
+           .filter(ee.Filter.lt('CLOUD_COVER', 20))
 
     dates_info = col.map(lambda img: img.set({
         'date': ee.Date(img.get('system:time_start')).format('YYYY-MM-dd'),
@@ -2259,7 +2260,7 @@ def analyze_two_times():
                 .merge(ee.ImageCollection('LANDSAT/LC09/C02/T1_L2')) \
                 .filterBounds(region) \
                 .filterDate(day.advance(-2, 'month'), day.advance(2, 'month')) \
-                .filter(ee.Filter.lt('CLOUD_COVER', 60))
+                .filter(ee.Filter.lt('CLOUD_COVER', 20))
 
         img = col.map(preprocess_image).median().clip(region)
         if selected_index == "NDVI":
@@ -2274,7 +2275,7 @@ def analyze_two_times():
         stats = img.select(bands).reduceRegion(
             reducer=ee.Reducer.mean(),
             geometry=region.geometry(),
-            scale=30,
+            scale=500,
             maxPixels=1e13,
             bestEffort=True
         ).getInfo()
@@ -2422,29 +2423,7 @@ def analyze_two_times():
 
         })
 
-        if selected_index == "NDVI":
-            bands = ['NDVI']
-        elif selected_index == "LST":
-            bands = ['LST']
-        elif selected_index == "TVDI":
-            bands = ['TVDI']
-        else:
-            bands = ['NDVI','LST','TVDI']
-
-        stats = img.select(bands).reduceRegion(
-            reducer=ee.Reducer.mean(),
-            geometry=region.geometry(),
-            scale=30,
-            maxPixels=1e13,
-            bestEffort=True
-        ).getInfo()
-
-        if not stats: stats = {}
-
-        ndvi_val = stats.get('NDVI')
-        lst_val  = stats.get('LST')
-        tvdi_val = stats.get('TVDI')
-
+     
         ai_text, ai_level, future_risk, trend = predict_ai(ndvi_val, lst_val, tvdi_val)
 
         if lst_val is not None and lst_val > 40:
