@@ -1983,7 +1983,7 @@ def get_time_series(region):
     col = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2') \
         .merge(ee.ImageCollection('LANDSAT/LC09/C02/T1_L2')) \
         .filterBounds(region) \
-        .filterDate('2015-01-01', '2025-12-31') \
+        .filterDate('2022-01-01', '2025-12-31') \
         .filter(ee.Filter.lt('CLOUD_COVER', 35)) \
         .sort('system:time_start') \
         .map(preprocess_image) \
@@ -2060,7 +2060,7 @@ def train_lstm(X, y):
     model.fit(
     X,
     y,
-    epochs=2,
+    epochs=1,
     batch_size=1,
     verbose=0
 )
