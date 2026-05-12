@@ -631,7 +631,9 @@ small{
 
     width:350px;
 
-    z-index:9999;
+    z-index:20000;
+
+    pointer-events:auto;
 
     border-radius:32px;
 
@@ -1962,13 +1964,16 @@ function toggleWeatherCard(){
             'weather-card'
         );
 
-    if(card.style.display === 'block'){
+    const current =
+        window.getComputedStyle(card).display;
 
-        card.style.display = 'none';
+    if(current === 'none'){
+
+        card.style.display = 'block';
 
     }else{
 
-        card.style.display = 'block';
+        card.style.display = 'none';
 
     }
 
