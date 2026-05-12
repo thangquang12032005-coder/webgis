@@ -2259,7 +2259,7 @@ def analyze_two_times():
         col = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2') \
                 .merge(ee.ImageCollection('LANDSAT/LC09/C02/T1_L2')) \
                 .filterBounds(region) \
-                .filterDate(day.advance(-2, 'month'), day.advance(2, 'month')) \
+                .filterDate(day.advance(-1, 'month'), day.advance(1, 'month')) \
                 .filter(ee.Filter.lt('CLOUD_COVER', 20))
 
         img = col.map(preprocess_image).median().clip(region)
@@ -2275,7 +2275,7 @@ def analyze_two_times():
         stats = img.select(bands).reduceRegion(
             reducer=ee.Reducer.mean(),
             geometry=region.geometry(),
-            scale=500,
+            scale=1000,
             maxPixels=1e13,
             bestEffort=True
         ).getInfo()
