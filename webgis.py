@@ -2124,7 +2124,11 @@ def predict_ai(ndvi, lst, tvdi):
         level = "Tốt"
         text = "🌿 Đánh giá trạng thái TỐT..."
 
-    future_features = np.array([[ndvi * 0.95, lst + 1.5, tvdi * 1.05]])
+    future_features = np.array([[
+       ndvi * np.random.uniform(0.92, 1.02),
+       lst + np.random.uniform(-2.5, 2.5),
+       tvdi * np.random.uniform(0.95, 1.08)
+     ]])
     future_pred = model.predict(future_features)[0]
     trend = "📈 Xu hướng xấu đi..." if future_pred > pred else "📉 Xu hướng cải thiện..."
 
@@ -2384,46 +2388,44 @@ def analyze_two_times():
             )
 
             forecast_7days = []
+            current_ndvi = ndvi_val or 0.45
+            current_lst  = lst_val or 30
+            current_tvdi = tvdi_val or 0.35
 
             for i in range(7):
+                 
+                # RANDOM THAY ĐỔI
+                current_ndvi += np.random.uniform(-0.03, 0.02)
+
+                current_lst += np.random.uniform(-1.5, 1.8)
+
+                current_tvdi += np.random.uniform(-0.02, 0.04)
+
+                # GIỚI HẠN GIÁ TRỊ
+                current_ndvi = max(-0.2, min(1, current_ndvi))
+
+                current_lst = max(10, min(60, current_lst))
+
+                current_tvdi = max(0, min(1, current_tvdi))
 
                 forecast_7days.append({
 
-                   "date":
-                   (
-                       base_date +
-                       timedelta(days=i+1)
-                   ).strftime("%Y-%m-%d"),
+                 "date":
+                 (
+                    base_date +
+                    timedelta(days=i+1)
+                 ).strftime("%Y-%m-%d"),
 
-                  "ndvi":
-                   round(
-                       float(
-                           (ndvi_val or 0.45)
-                           - i * 0.01
-                       ),
-                       3
-                   ),
+                 "ndvi":
+                 round(float(current_ndvi), 3),
 
-                   "lst":
-                   round(
-                       float(
-                            (lst_val or 30)
-                            + i * 0.3
-                       ),
-                1
-                   ),
+                 "lst":
+                 round(float(current_lst), 1),
 
-            "tvdi":
-            round(
-                float(
-                    (tvdi_val or 0.35)
-                    + i * 0.01
-                ),
-                3
-            )
+                 "tvdi":
+                 round(float(current_tvdi), 3)
 
-        })
-
+         })
      
         ai_text, ai_level, future_risk, trend = predict_ai(ndvi_val, lst_val, tvdi_val)
 
