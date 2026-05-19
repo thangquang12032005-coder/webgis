@@ -747,8 +747,11 @@ small{
             <div class="step-header" id="txt-time1"><i class="fa-solid fa-clock"></i> Thời điểm 1</div>
             <div class="time-row">
                 <select id="year1-input">
-                    <option value="2024">2024</option><option value="2023">2023</option><option value="2022">2022</option>
-                    <option value="2021">2021</option><option value="2020">2020</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024" selected>2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
                 </select>
                 <select id="month1-input">
                     <option value="1">Tháng 1</option><option value="2">Tháng 2</option><option value="3" selected>Tháng 3</option>
@@ -767,8 +770,11 @@ small{
             <div class="step-header" id="txt-time2"><i class="fa-solid fa-clock"></i> Thời điểm 2</div>
             <div class="time-row">
                 <select id="year2-input">
-                    <option value="2024">2024</option><option value="2023">2023</option><option value="2022">2022</option>
-                    <option value="2021">2021</option><option value="2020">2020</option>
+                    <option value="2026">2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024" selected>2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
                 </select>
                 <select id="month2-input">
                     <option value="1">Tháng 1</option><option value="2">Tháng 2</option><option value="3" selected>Tháng 3</option>
@@ -1984,7 +1990,7 @@ def get_time_series(region):
     col = ee.ImageCollection('LANDSAT/LC08/C02/T1_L2') \
         .merge(ee.ImageCollection('LANDSAT/LC09/C02/T1_L2')) \
         .filterBounds(region) \
-        .filterDate('2022-01-01', '2025-12-31') \
+        .filterDate('2022-01-01', '2026-5-31') \
         .filter(ee.Filter.lt('CLOUD_COVER', 35)) \
         .sort('system:time_start') \
         .map(preprocess_image) \
