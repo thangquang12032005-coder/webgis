@@ -588,7 +588,7 @@ small{
     position:fixed;
 
     top:20px;
-    left:20px;
+    left:500px;
 
     width:60px;
     height:60px;
@@ -626,7 +626,7 @@ small{
     position:fixed;
 
     top:90px;
-    left:20px;
+    left:500px;
 
     width:350px;
 
@@ -822,7 +822,60 @@ small{
         <canvas id="lstChart"></canvas>
     </div>
 </div>
+<!-- FORECAST LST 7 DAYS -->
+<div id="forecast-lst-container">
 
+    <div style="
+        text-align:center;
+        font-weight:700;
+        font-size:15px;
+        color:#38bdf8;
+        margin-bottom:8px;
+    ">
+        Forecast LST 7 Days
+    </div>
+
+    
+        <div style="
+    display:grid;
+    grid-template-columns:1fr;
+    gap:28px;
+">
+
+    <div>
+        <div style="
+            text-align:center;
+            font-weight:700;
+            color:#38bdf8;
+            margin-bottom:10px;
+        ">
+            Forecast Time 1
+        </div>
+
+        <div class="chart-wrapper">
+            <canvas id="forecastLstChart1"></canvas>
+        </div>
+    </div>
+
+    <div>
+        <div style="
+            text-align:center;
+            font-weight:700;
+            color:#ef4444;
+            margin-bottom:10px;
+        ">
+            Forecast Time 2
+        </div>
+
+        <div class="chart-wrapper">
+            <canvas id="forecastLstChart2"></canvas>
+        </div>
+    
+
+</div>
+    </div>
+
+</div>
 <!-- SCATTER THÊM MỚI -->
 <div id="scatter-chart-container">
     <div style="text-align:center; font-weight:700; font-size:15px; color:#6366f1; margin-bottom:8px;">
@@ -971,7 +1024,12 @@ function changeLanguage(lang) {
 // Global variables
 var map, baseSatellite, boundaryLayer, layerControl, indexLayers = {};
 var currentAnalysisData = null;
-var ndviChart, tvdiChart, lstChart, scatterChart;
+var ndviChart,
+    tvdiChart,
+    lstChart,
+    scatterChart,
+    forecastLstChart1,
+    forecastLstChart2;
 var focusMode = false;
 
 function showToast(message) {
@@ -1271,6 +1329,11 @@ function renderChart(data) {
     if (ndviChart) ndviChart.destroy();
     if (tvdiChart) tvdiChart.destroy();
     if (lstChart) lstChart.destroy();
+    if (forecastLstChart1)
+    forecastLstChart1.destroy();
+
+    if (forecastLstChart2)
+    forecastLstChart2.destroy();
 
     const selectedIndex = document.getElementById("index-selector").value.toUpperCase();
     const labels = [data.stats[0].label, data.stats[1].label];
@@ -1334,6 +1397,212 @@ if (selectedIndex === "TẤT CẢ") {
         }
     }
 });
+// =========================
+// FORECAST TIME 1
+// =========================
+
+if (
+    data.stats[0].forecast_7days
+) {
+
+    const forecastData1 =
+        data.stats[0].forecast_7days;
+
+    forecastLstChart1 =
+        new Chart(
+
+           document.getElementById('forecastLstChart1'),
+    {
+        type: 'line',
+        data: {
+            labels: forecastData1.map(f => f.date),
+            datasets: [{
+                label: 'Time 1',
+                data: forecastData1.map(f => f.lst),
+                
+                // --- Cải tiến thẩm mỹ cho đường Line ---
+                borderColor: '#38bdf8',
+                borderWidth: 3,                 // Tăng độ dày đường để nổi bật hơn
+                tension: 0.4,
+                
+                // --- Đổ nền Gradient mượt mà thay vì màu solid ---
+                fill: true,
+                backgroundColor: function(context) {
+                    const chart = context.chart;
+                    const {ctx, chartArea} = chart;
+                    if (!chartArea) return null;
+                    
+                    const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                    gradient.addColorStop(0, 'rgba(56, 189, 248, 0.25)'); // Đậm ở trên
+                    gradient.addColorStop(1, 'rgba(56, 189, 248, 0.00)'); // Nhạt dần về đáy
+                    return gradient;
+                },
+
+                // --- Tùy chỉnh các điểm nút (Points) tinh tế hơn ---
+                pointRadius: 4,                 // Thu nhỏ điểm mặc định một chút
+                pointHoverRadius: 7,            // Phóng to khi di chuột vào
+                pointBackgroundColor: '#ffffff', // Nền trắng phối viền xanh tạo hiệu ứng "bọc đường"
+                pointBorderColor: '#38bdf8',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            
+            // --- Hiệu ứng mượt mà khi tải dữ liệu ---
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            },
+
+            plugins: {
+                legend: {
+                    display: false
+                },
+                // Thiết kế lại hộp thông tin khi di chuột vào (Tooltip)
+                tooltip: {
+                    backgroundColor: '#1e293b', // Màu nền tối hiện đại (Slate 800)
+                    titleColor: '#94a3b8',
+                    bodyColor: '#f8fafc',
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: false       // Ẩn hộp màu vuông nhỏ không cần thiết
+                }
+            },
+            scales: {
+                x: {
+                    // Làm sạch trục X
+                    grid: {
+                        display: false        // Ẩn các đường lưới dọc để biểu đồ thoáng hơn
+                    },
+                    ticks: {
+                        color: '#64748b',     // Màu chữ xám hiện đại
+                        font: { family: 'Inter, sans-serif', size: 12 }
+                    }
+                },
+                y: {
+                    min: 0,
+                    max: 50,
+                    // Làm mờ trục Y
+                    grid: {
+                        color: 'rgba(226, 232, 240, 0.6)', // Đường lưới ngang mảnh và mờ nhẹ
+                        drawBorder: false                  // Ẩn đường biên ngoài cùng bên trái
+                    },
+                    ticks: {
+                        color: '#64748b',
+                        font: { family: 'Inter, sans-serif', size: 12 },
+                        padding: 8
+                    }
+                }
+            }
+        }
+    }
+);
+}
+
+
+// =========================
+// FORECAST TIME 2
+// =========================
+
+if (
+    data.stats[1].forecast_7days
+) {
+
+    const forecastData2 =
+        data.stats[1].forecast_7days;
+
+    forecastLstChart2 =
+        new Chart(
+
+            document.getElementById('forecastLstChart2'),
+    {
+        type: 'line',
+        data: {
+            labels: forecastData2.map(f => f.date),
+            datasets: [{
+                label: 'Time 2',
+                data: forecastData2.map(f => f.lst),
+                
+                // --- Cải tiến thẩm mỹ cho đường Line màu đỏ ---
+                borderColor: '#ef4444',
+                borderWidth: 3,                 // Tăng độ dày đường để nổi bật hơn
+                tension: 0.4,
+                
+                // --- Đổ nền Gradient đỏ mượt mà ---
+                fill: true,
+                backgroundColor: function(context) {
+                    const chart = context.chart;
+                    const {ctx, chartArea} = chart;
+                    if (!chartArea) return null;
+                    
+                    const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                    gradient.addColorStop(0, 'rgba(239, 68, 68, 0.25)'); // Đỏ dịu ở đỉnh
+                    gradient.addColorStop(1, 'rgba(239, 68, 68, 0.00)'); // Nhạt dần về đáy
+                    return gradient;
+                },
+
+                // --- Tùy chỉnh các điểm nút (Points) đồng bộ ---
+                pointRadius: 4,                 
+                pointHoverRadius: 7,            
+                pointBackgroundColor: '#ffffff', // Tâm trắng tạo hiệu ứng nổi
+                pointBorderColor: '#ef4444',     // Viền đỏ đồng bộ
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            
+            // --- Hiệu ứng mượt mà khi tải dữ liệu ---
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuart'
+            },
+
+            plugins: {
+                legend: {
+                    display: false
+                },
+                // Hộp thông tin khi di chuột vào (Tooltip) hiện đại
+                tooltip: {
+                    backgroundColor: '#1e293b', // Nền tối sang trọng
+                    titleColor: '#94a3b8',
+                    bodyColor: '#f8fafc',
+                    padding: 12,
+                    cornerRadius: 8,
+                    displayColors: false       
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false        // Ẩn các lưới dọc để tránh rối mắt
+                    },
+                    ticks: {
+                        color: '#64748b',     // Chữ xám thanh lịch
+                        font: { family: 'Inter, sans-serif', size: 12 }
+                    }
+                },
+                y: {
+                    min: 0,
+                    max: 50,
+                    grid: {
+                        color: 'rgba(226, 232, 240, 0.6)', // Lưới ngang mờ nhẹ
+                        drawBorder: false                  
+                    },
+                    ticks: {
+                        color: '#64748b',
+                        font: { family: 'Inter, sans-serif', size: 12 },
+                        padding: 8
+                    }
+                }
+            }
+        }
+    }
+);
+}
 }
 
     if (selectedIndex === "NDVI" || selectedIndex === "TẤT CẢ") {
